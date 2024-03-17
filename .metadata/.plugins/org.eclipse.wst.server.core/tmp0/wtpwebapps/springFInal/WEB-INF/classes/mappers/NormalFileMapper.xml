@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myfinal.www.repository.NormalFileDAO">
+
+	<insert id="insertFile">
+		insert into nmfile (nm_uuid, nm_save_dir, nm_file_name, nm_file_type, nm_bno, nm_file_size)
+		values(#{nmUuid}, #{nmSaveDir}, #{nmFileName}, #{nmFileType}, #{nmBno}, #{nmFileSize})
+	</insert>
+
+	<select id="getFileList" resultType="com.myfinal.www.domain.nmFileVO">
+		select * from nmfile where nm_bno =#{nmBno}
+	</select>
+	
+	<delete id="removeFile">
+		delete from nmfile where nm_uuid = #{nmUuid}
+	</delete>
+
+
+</mapper>

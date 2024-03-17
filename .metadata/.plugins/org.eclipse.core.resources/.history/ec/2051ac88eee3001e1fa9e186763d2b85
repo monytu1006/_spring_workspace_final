@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.myfinal.www.repository.AnonymousBoardDAO">
+
+	<insert id="insert">
+		insert into anboard(an_title, an_content)
+		values(#{anTitle}, #{anContent})
+	</insert>
+	
+	<select id="getList" resultType="com.myfinal.www.domain.anBoardVO">
+		select * from anboard
+		<include refid="search"></include>
+		order by an_bno desc
+		limit #{pageStart}, #{qty}
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+		select count(an_bno) from anboard
+		<include refid="search"></include>
+	</select>
+	
+	<update id="readCount">
+		update anboard set an_read_count = an_read_count + 1 where an_bno = #{anBno}
+	</update>
+
+	
+	<select id="getDetail" resultType="com.myfinal.www.domain.anBoardVO">
+		select * from anboard where an_bno = #{anBno}
+	</select>
+	
+	<update id="modify">
+		update anboard set
+		an_title = #{anTitle},
+		an_content = #{anContent},
+		an_mod_at =now(),
+		an_read_count = an_read_count - 2
+		where an_bno = #{anBno}
+	</update>
+	
+	<delete id="delete">
+		delete from anboard where an_bno =#{anBno}
+	</delete>
+	
+	<sql id="search">
+		<if test="type!=null">
+			<trim prefix="where(" suffix=")" prefixOverrides="or"> 
+				<foreach collection="typeToArray" item="type">
+					<trim prefix="or">
+						<choose>
+							<when test="type=='t'.tostring">
+								nm_title like concat('%', #{keyword}, '%')
+							</when>
+							<when test="type=='c'.tostring">
+								nm_content like concat('%', #{keyword}, '%')
+							</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+
+
+
+</mapper>

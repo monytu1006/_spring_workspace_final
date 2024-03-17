@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myfinal.www.repository.CustomerManageCommentDAO">
+
+	<insert id="insert">
+		insert into cmcomment(cm_bno, cm_writer, cm_content)
+		values(#{cmBno}, #{cmWriter}, #{cmContent})
+	</insert>
+	
+	<select id="getList" resultType="com.myfinal.www.domain.cmCommentVO">
+		select * from cmcomment where cm_bno=#{cmBno}
+		order by cm_cno desc
+		limit #{pgvo.pageStart}, #{pgvo.qty}
+	</select>
+	
+	<select id="selectOneBnoTotalCount" resultType="int">
+		select count(cm_bno) from cmcomment where cm_bno=#{cmBno}
+	</select>
+	
+	
+	<update id="edit">
+		update cmcomment set 
+		cm_content = #{cmContent}
+		cm_mod_at = now()
+		where cm_cno = #{cmCno}
+	</update>
+
+	<delete id="delete">
+		delete from cmcomment where cm_cno =#{cmCno}
+	</delete>
+
+
+
+
+
+
+
+
+</mapper>

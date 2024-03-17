@@ -1,0 +1,126 @@
+package com.myfinal.www.controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.myfinal.www.domain.nmBoardDTO;
+import com.myfinal.www.domain.nmBoardVO;
+import com.myfinal.www.domain.nmFileVO;
+import com.myfinal.www.domain.nmPagingVO;
+import com.myfinal.www.handler.nmFileHandler;
+import com.myfinal.www.handler.nmPagingHandler;
+import com.myfinal.www.service.NormalBoardService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/nmboard/*")
+@RequiredArgsConstructor
+public class NormalBoardController {
+	
+	private final NormalBoardService bsv;
+
+	private final nmFileHandler nmfhd;
+	
+	@GetMapping("/register")
+	public void register() {}
+	
+	@PostMapping("/register")
+	public String insert(nmBoardVO nmbvo, @RequestParam(name="files", required = false)MultipartFile[] files) {
+		log.info(">>> nmbvo >>>> {}", nmbvo);
+		List<nmFileVO> flist = null;
+		
+		if(files[0].getSize() > 0) {
+			flist = nmfhd.uploadFiles(files);
+			log.info(">>>>>>>>flist>> {}",flist);
+		} else {
+			log.info("file null");
+		}
+		
+		nmBoardDTO bdto = new nmBoardDTO(nmbvo, flist);
+		
+		int isOk = bsv.insert(bdto);
+
+		log.info(">>>>> nmboard register >>>>>" + ((isOk > 0) ? "OK" : "Fail"));
+		
+		return "redirect:/nmboard/list";
+	}
+	
+	@GetMapping("/list")
+	public void list(Model m, nmPagingVO pgvo) {
+		List<nmBoardVO> list = bsv.getList(pgvo);
+		int totalCount = bsv.getTotalCount(pgvo);
+		
+		nmPagingHandler ph = new nmPagingHandler(pgvo, totalCount);
+		m.addAttribute("list", list);
+		m.addAttribute("ph", ph);
+	}
+ 
+	
+	@GetMapping({"/detail", "/modify"})
+	public void detail(Model m, @RequestParam("nmbno") long nmbno) {
+		log.info(">>>> nmbno >>"+nmbno);
+		m.addAttribute("bdto", bsv.getDetail(nmbno));
+	}
+	
+	@PostMapping("/modify")
+	public String modify(nmBoardVO nmbvo, @RequestParam(name="files", required = false)MultipartFile[] files) {
+		log.info(">>>>> nmbvo >>>>> {}", nmbvo);
+		
+		List<nmFileVO> flist = null;
+		
+		if(files[0].getSize()>0) {
+			flist = nmfhd.uploadFiles(files);
+			log.info(">>>>> flist >>>>> {}" ,flist);
+		} else{
+			log.info("파일이 없습니다");
+		}
+		
+		nmBoardDTO bdto = new nmBoardDTO(nmbvo, flist);
+		
+		int isOk = bsv.modify(bdto);
+		log.info("modify is " + ((isOk >0)? "OK" : "Fail"));
+		
+		return "redirect:/nmboard/detail?nmbno=" + nmbvo.getNmBno();
+	}
+	
+	@GetMapping("/remove")
+	public String delete(@RequestParam("nmbno") long nmbno ) {
+		log.info(">>>>> nmbno >>>>> {}"+ nmbno);
+		int isOk = bsv.delete(nmbno);
+		log.info(">>>> delete>>>> is" + (isOk > 0? "OK" : "Fail"));
+		
+		return "redirect:/nmboard/list";
+	}
+	
+	@DeleteMapping("/{nmUuid}")
+	public ResponseEntity<String> removeFile(@PathVariable("nmUuid")String nmUuid){
+		log.info(">>>>> nmUuid>>>>> {}", nmUuid);
+		int isOk = bsv.removeFile(nmUuid);
+		
+		log.info(">>>>> delete is " + (isOk > 0? "OK" : "Fail"));
+		
+		return (isOk > 0) ? 
+				new ResponseEntity<String>("1", HttpStatus.OK):
+				new ResponseEntity<String>("0", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+}
+
+
+
+
+

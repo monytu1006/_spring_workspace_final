@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.myfinal.www.repository.NormalBoardDAO">
+	
+	<insert id="insert">
+		insert into nmboard(nm_title, nm_writer, nm_content)
+		values(#{nmTitle}, #{nmWriter}, #{nmContent})
+	</insert>
+	
+	<select id="getList" resultType="com.myfinal.www.domain.nmBoardVO">
+		select * from nmboard
+		<include refid="search"></include>
+		order by nm_bno desc
+		limit #{pageStart}, #{qty}
+	</select>
+	
+	<select id="getDetail" resultType="com.myfinal.www.domain.nmBoardVO">
+		select * from nmboard where nm_bno = #{nmBno}
+	
+	</select>
+	
+	<update id="readCount">
+		update nmboard set nm_read_count = nm_read_count + 1 where nm_bno = #{nmBno}
+	</update>
+
+	<update id="modify">
+		update nmboard set
+		nm_title = #{nmTitle},
+		nm_content = #{nmContent},
+		nm_mod_at =now(),
+		nm_read_count = nm_read_count - 2
+		where nm_bno = #{nmBno}
+	</update>
+	 
+	 
+	<delete id="delete">
+		delete from nmboard where nm_bno = #{nmBno}
+	</delete>
+	
+	<select id="getTotalCount" resultType="int">
+		select count(nm_bno) from nmboard
+		<include refid="search"></include>
+	</select>
+	
+	<select id="selectOneBno" resultType="long">
+		select max(nm_bno) from nmboard
+	</select>
+	
+	<update id="updateCommentQty">
+		update nmboard b set nm_cmt_qty = 
+		(select count(nm_bno) from nmcomment where nm_bno = b.nm_bno)
+	</update>
+
+	<update id="updateFileQty">
+		update nmboard b set nm_has_file = 
+		(select count(nm_bno) from nmfile where nm_bno = b.nm_bno)
+	</update>
+	
+	
+	
+	
+<sql id="search">
+		<if test="type!=null">
+			<trim prefix="where(" suffix=")" prefixOverrides="or"> 
+				<foreach collection="typeToArray" item="type">
+					<trim prefix="or">
+						<choose>
+							<when test="type=='t'.tostring">
+								nm_title like concat('%', #{keyword}, '%')
+							</when>
+							<when test="type=='w'.tostring">
+								nm_writer like concat('%', #{keyword}, '%')
+							</when>
+							<when test="type=='c'.tostring">
+								nm_content like concat('%', #{keyword}, '%')
+							</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+	
+	
+	
+	
+	
+	
+	
+ 
+</mapper>

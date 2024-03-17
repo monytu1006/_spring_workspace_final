@@ -1,0 +1,14 @@
+
+2월 08, 2024 09:17:11.454 NEW SESSION
+2월 08, 2024 09:17:11.454 INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+
+3월 15, 2024 10:36:20.856 NEW SESSION
+3월 15, 2024 10:36:20.857 INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+3월 15, 2024 10:40:17.483 [15152:12996:0315/104017.482:ERROR:connection_factory_impl.cc(478)] ConnectionHandler failed with net error: -2
+3월 15, 2024 10:46:20.855 [15152:12996:0315/104620.854:ERROR:connection_factory_impl.cc(434)] Failed to connect to MCS endpoint with error -105
+3월 15, 2024 11:24:53.353 [15152:12996:0315/112453.352:ERROR:connection_factory_impl.cc(478)] ConnectionHandler failed with net error: -2
+3월 15, 2024 11:24:53.354 [15152:876:0315/112453.354:ERROR:device_event_log_impl.cc(192)] [11:24:53.354] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: �슂�냼媛� �뾾�뒿�땲�떎. (0x490)
+3월 15, 2024 11:24:53.403 [15152:12996:0315/112453.403:ERROR:connection_factory_impl.cc(434)] Failed to connect to MCS endpoint with error -105
+3월 15, 2024 11:25:13.249 [15152:12996:0315/112513.249:ERROR:connection_factory_impl.cc(478)] ConnectionHandler failed with net error: -2
+3월 15, 2024 13:31:52.116 [15152:12996:0315/133152.116:ERROR:connection_factory_impl.cc(434)] Failed to connect to MCS endpoint with error -105
+3월 15, 2024 13:32:13.737 [15152:876:0315/133213.737:ERROR:device_event_log_impl.cc(192)] [13:32:13.737] USB: usb_service_win.cc:105 SetupDiGetDeviceProperty({{A45C254E-DF1C-4EFD-8020-67D146A850E0}, 6}) failed: �슂�냼媛� �뾾�뒿�땲�떎. (0x490)

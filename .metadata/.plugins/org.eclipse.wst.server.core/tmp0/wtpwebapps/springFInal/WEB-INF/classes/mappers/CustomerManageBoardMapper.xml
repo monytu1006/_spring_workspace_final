@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.myfinal.www.repository.CustomerManagerBoardDAO">
+	
+	<insert id="insert">
+		insert into cmboard(cm_category, cm_title, cm_writer, cm_content)
+		values(#{cmCategory}, #{cmTitle}, #{cmWriter}, #{cmContent})
+	</insert>
+	
+	<select id="getList" resultType="com.myfinal.www.domain.cmBoardVO">
+		select * from cmboard
+		<include refid="search"></include>
+		order by cm_bno desc
+		limit #{pageStart}, #{qty}
+	</select>
+	
+	<select id="getDetail" resultType="com.myfinal.www.domain.cmBoardVO">
+		select * from cmboard where cm_bno = #{cmBno}
+	
+	</select>
+	
+	<update id="readCount">
+		update cmboard set cm_read_count = cm_read_count + 1 where cm_bno = #{cmBno}
+	</update>
+
+	<update id="modify">
+		update cmboard set
+		cm_category = #{cmCategory},
+		cm_title = #{cmTitle},
+		cm_content = #{cmContent},
+		cm_mod_at =now(),
+		cm_read_count = cm_read_count - 2
+		where cm_bno = #{cmBno}
+	</update>
+	 
+	 
+	<delete id="delete">
+		delete from cmboard where cm_bno = #{cmBno}
+	</delete>
+	
+	<select id="getTotalCount" resultType="int">
+		select count(cm_bno) from cmboard
+		<include refid="search"></include>
+	</select>
+	
+	<select id="selectOneBno" resultType="long">
+		select max(cm_bno) from cmboard
+	</select>
+	
+	<update id="updateCommentQty">
+		update cmboard c set cm_cmt_qty = 
+		(select count(cm_bno) from cmcomment where cm_bno = c.cm_bno)
+	</update>
+
+	<update id="updateFileQty">
+		update cmboard c set cm_has_file = 
+		(select count(cm_bno) from cmfile where cm_bno = c.cm_bno)
+	</update>
+	
+	
+	
+	
+<sql id="search">
+		<if test="type!=null">
+			<trim prefix="where(" suffix=")" prefixOverrides="or"> 
+				<foreach collection="typeToArray" item="type">
+					<trim prefix="or">
+						<choose>
+							<when test="type=='g'.tostring">
+								cm_category like concat('%', #{keyword}, '%')
+							</when>
+							<when test="type=='t'.tostring">
+								cm_title like concat('%', #{keyword}, '%')
+							</when>
+							<when test="type=='w'.tostring">
+								cm_writer like concat('%', #{keyword}, '%')
+							</when>
+							<when test="type=='c'.tostring">
+								cm_content like concat('%', #{keyword}, '%')
+							</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+	
+	
+	
+	
+	
+	
+	
+ 
+</mapper>

@@ -1,0 +1,68 @@
+package com.myfinal.www.handler;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import com.myfinal.www.domain.nmFileVO;
+import com.myfinal.www.repository.NormalFileDAO;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequiredArgsConstructor
+@Component
+@EnableScheduling
+public class FileSweeper {
+	
+	private final String BASE_PATH = "D:\\moon\\_myProject\\_java\\_fileUpload\\";
+	
+	private final NormalFileDAO nmfdao;
+	
+	@Scheduled(cron="0 46 10 * * *")
+	public void fileSweeper() {
+		log.info(">>>>>>>>>>>> FileSweeper Running Start~!! : {}"+LocalDateTime.now());
+		
+		List<nmFileVO> dbList = nmfdao.selectListAllFile();
+		
+		List<String> currFiles = new ArrayList<String>();		
+		
+		for(nmFileVO nmfvo : dbList) {
+			String filePath = nmfvo.getNmSaveDir() +File.separator+nmfvo.getNmUuid();
+			String fileName = nmfvo.getNmFileName();
+			currFiles.add(BASE_PATH+filePath+"_"+fileName);
+			
+			if(nmfvo.getNmFileType() > 0) {
+				currFiles.add(BASE_PATH+filePath+"_th_"+fileName);
+			}
+		}
+		
+		log.info(">>>>>>>>>>>>>>>>>>>>>>>>> currFiles"+currFiles);
+		
+		LocalDate now = LocalDate.now();
+		String today = now.toString();
+		today = today.replace("-", File.separator);
+		
+		File dir = Paths.get(BASE_PATH+today).toFile();
+		File[] allFileObjects = dir.listFiles();
+		
+		for(File file : allFileObjects) {
+			String storedFileName = file.toPath().toString();
+			if(!currFiles.contains(storedFileName)) {
+				file.delete();
+				log.info(">>>>>>>>>>>>>> delete file >>>>>>>{}"+storedFileName);
+			}
+		}
+		log.info(">>>>>>>>>>>> FileSweeper Running Finish~!! : {}"+LocalDateTime.now());
+	}
+	
+	
+}
